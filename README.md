@@ -13,4 +13,6 @@ API-ключи необходимо внести в файл ./settings/settings
     pip3 install python-telegram-bot-pagination
     
 
-
+#### Запуск
+    
+    py .\start.py
