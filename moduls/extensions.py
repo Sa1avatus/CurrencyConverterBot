@@ -30,7 +30,7 @@ class SimilarCurrenciesException(APIException):
 
 class Cryptoconverter():
     @staticmethod
-    def convert(base: str, quote: str, amount: str):
+    def get_price(base: str, quote: str, amount: str):
         if quote == base:
             raise SimilarCurrenciesException
 

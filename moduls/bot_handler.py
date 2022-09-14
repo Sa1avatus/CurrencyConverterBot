@@ -33,7 +33,7 @@ def convert(message: telebot.types.Message):
         if len(message.text.split()) != 3:
             raise e.WrongNumberArgumentsException
         base, quote, amount = message.text.upper().split()
-        text = e.Cryptoconverter.convert(base, quote, amount)
+        text = e.Cryptoconverter.get_price(base, quote, amount)
     except e.APIException as exc:
         bot.reply_to(message, f'{exc}')
     else:
