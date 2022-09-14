@@ -24,18 +24,7 @@ def handle_docs_audio(message: telebot.types.Message):
 
 @bot.message_handler(commands=['values'])
 def values(message: telebot.types.Message):
-    text = 'Доступные для конвертации валюты:'
-    for k, v in s.CURRENCIES.items():
-        text += f'\n{k:5}:\t{v}'
-    #print(text)
-    paginator = InlineKeyboardPaginator(
-        len(s.CURRENCIES) // 10 + 1,
-        current_page = 1,
-        data_pattern = 'elements#{page}'
-    )
-    paginator.add_after(telebot.types.InlineKeyboardButton('Go back', callback_data='back'))
-    bot.send_message(message.chat.id, text, reply_markup=paginator.markup, parse_mode='Markdown')
-    #bot.reply_to(message, text)
+    send_page(message)
 
 
 @bot.message_handler(content_types=['text'])
@@ -45,12 +34,39 @@ def convert(message: telebot.types.Message):
             raise e.WrongNumberArgumentsException
         base, quote, amount = message.text.upper().split()
         text = e.Cryptoconverter.convert(base, quote, amount)
-    except e.ConversionException as exc:
+    except e.APIException as exc:
         bot.reply_to(message, f'{exc}')
     else:
-        bot.reply_to(message, f'На текущий момент {amount} {base} можно обменять на {text} {quote}')
+        bot.reply_to(message, f'На текущий момент {amount} {base} ({s.CURRENCIES[base]}) можно обменять на {text} {quote} ({s.CURRENCIES[quote]})')
 
 
 def start():
     bot.polling(none_stop=True)
 
+
+@bot.callback_query_handler(func=lambda call: call.data.split('#')[0]=='page')
+def page_callback(call):
+    page = int(call.data.split('#')[1])
+    bot.delete_message(
+        call.message.chat.id,
+        call.message.message_id
+    )
+    send_page(call.message, page)
+
+
+def send_page(message, page=1):
+    paginator = InlineKeyboardPaginator(
+        len(s.CURRENCIES) // 10 + 1,
+        current_page=page,
+        data_pattern='page#{page}'
+    )
+    text = 'Доступные для конвертации валюты:'
+    for k in list(map(list, s.CURRENCIES.items()))[(page-1)*10:(page-1)*10 + 10]:
+        text += f'\n{k[0]:5}:\t{k[1]}'
+    paginator.add_after(telebot.types.InlineKeyboardButton('Go back', callback_data='back'))
+    bot.send_message(
+            message.chat.id,
+            text,
+            reply_markup=paginator.markup,
+            parse_mode='Markdown'
+        )
