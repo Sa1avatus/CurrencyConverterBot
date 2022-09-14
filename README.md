@@ -3,14 +3,14 @@
 
 API-ключи необходимо внести в файл ./settings/settings.py
 
-Зависимости:
+#### Зависимости
 
-telebot. Установка pip3 install pyTelegramBotAPI
+    pip3 install pyTelegramBotAPI
+    pip3 install lxml
+    pip3 install requests
+    pip3 install redis
+    pip3 install json
+    pip3 install python-telegram-bot-pagination
+    
 
-lxml.html. Установка  pip3 install lxml
 
-requests. Установка pip3 install requests
-
-redis. Установка pip3 install redis
-
-json. Установка pip3 install json
