@@ -10,7 +10,7 @@ API-ключи необходимо внести в файл ./settings/settings
     pip3 install requests
     pip3 install redis
     pip3 install json
-    pip3 install python-telegram-bot-pagination
+    pip3 install python-telegram-bot-pagination #https://github.com/ksinn/python-telegram-bot-pagination
     
 
 #### Запуск
