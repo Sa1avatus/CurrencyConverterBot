@@ -2,6 +2,7 @@ from settings import settings as s
 import requests
 import json
 from telegram_bot_pagination import InlineKeyboardPaginator
+import redis
 
 
 class APIException(Exception):
@@ -28,13 +29,21 @@ class SimilarCurrenciesException(APIException):
         return f'Вы пытаетесь перевести в ту же валюту!'
 
 
+class NoConnectonException(APIException):
+    def __str__(self):
+        return f'Нет соединения с сервером API!'
+
+# class TimeoutErrorException(APIException):
+#     def __str__(self):
+#         return f'Нет соединения с сервером API!'
+
 class Cryptoconverter():
     @staticmethod
     def get_price(base: str, quote: str, amount: str):
         if quote == base:
             raise SimilarCurrenciesException
 
-        if quote not in s.CURRENCIES.keys() or base not in s.CURRENCIES.keys():
+        if quote not in CURRENCIES.keys() or base not in CURRENCIES.keys():
             raise WrongCurrencyException
 
         if not amount.isdecimal() or float(amount) < 0:
@@ -44,7 +53,7 @@ class Cryptoconverter():
         html = requests.get(url, headers={"apikey": s.WEBSITE_APIKEY}).content
 
         if not json.loads(html)['success']:
-            raise APIException
+            raise NoConnectonException
         else:
             text = json.loads(html)['result']
 
@@ -57,4 +66,16 @@ class MyPaginator(InlineKeyboardPaginator):
     current_page_label = '-{}-'
     next_page_label = '>'
     last_page_label = '>>'
+
+
+try:
+    red = redis.Redis(host=s.REDIS_HOST, port=s.REDIS_PORT, password=s.REDIS_PASSWORD)
+    CURRENCIES = json.loads(red.get('CURRENCIES'))
+except Exception as e:
+    print(f'Redis Error: {e}')
+    try:
+        CURRENCIES = dict(json.loads(requests.get('https://api.apilayer.com/exchangerates_data/symbols',
+                                                  headers={"apikey": s.WEBSITE_APIKEY}).content)['symbols'])
+    except Exception as e:
+        print(f'WEBSITE Error: {e}')
 
