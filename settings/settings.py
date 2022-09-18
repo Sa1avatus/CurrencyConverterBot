@@ -4,6 +4,7 @@ REDIS_PASSWORD = '' # Пароль в Redis
 BOT_TOKEN = '' #Токен Телеграм-бота
 WEBSITE_APIKEY = '' #API ключ вебсайта
 WEBSITE = 'https://api.apilayer.com/exchangerates_data/convert?to=[to_curr]&from=[from_curr]&amount=[amount]' #URL веб-страницы
+#Если не успею исправить обработку страниц до проверки проекта, то список валют берётся отсюда.
 CURRENCIES = {
 'USD': 'United States Dollar',
 'EUR': 'Euro',
