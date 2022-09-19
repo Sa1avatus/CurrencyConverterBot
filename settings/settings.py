@@ -27,3 +27,8 @@ CURRENCIES = {
 'THB': 'Thai Baht',
 'VND': 'Vietnamese Dong',
 }
+EXCHANGE_DATA = {
+    "base": "",
+    "quote": "",
+    "amount": ""
+}
