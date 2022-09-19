@@ -46,10 +46,10 @@ class Cryptoconverter():
         if quote not in CURRENCIES.keys() or base not in CURRENCIES.keys():
             raise WrongCurrencyException
 
-        if not amount.isdecimal() or float(amount) < 0:
+        if not str(amount).isdecimal() or float(str(amount)) < 0:
             raise NotDecimalException
 
-        url = s.WEBSITE.replace('[to_curr]', quote).replace('[from_curr]', base).replace('[amount]', amount)
+        url = s.WEBSITE.replace('[to_curr]', quote).replace('[from_curr]', base).replace('[amount]', str(amount))
         html = requests.get(url, headers={"apikey": s.WEBSITE_APIKEY}).content
 
         if not json.loads(html)['success']:
