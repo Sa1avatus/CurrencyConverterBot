@@ -28,7 +28,7 @@ def handle_docs_audio(message: telebot.types.Message):
 def convert(message: telebot.types.Message):
     data = s.EXCHANGE_DATA.copy()
     data['m'] = 'b'
-    text = 'Выберите валюту из которой конвертировать:'
+    text = s.MESSAGE_TEXT[data['m']]
     bot.send_message(message.chat.id, text, reply_markup=get_markup(data))
 
 
@@ -38,7 +38,7 @@ def base_handler(call):
     #print(type(call.data.split('#')[1]))
     data = data_normalisation(call.data.split('#')[-1])
     data['m'] = 'q'
-    text = 'Выберите валюту в которую конвертировать:'
+    text = s.MESSAGE_TEXT[data['m']]
     bot.send_message(call.message.chat.id, text, reply_markup=get_markup(data), parse_mode='Markdown')
 
 
@@ -46,7 +46,7 @@ def quote_handler(call):
     #print(f'def quote_handler(message: telebot.types.Message, base): {call.data}')
     data = data_normalisation(call.data.split('#')[-1])
     data['m'] = 'am'
-    text = 'Введите количество валюты для конвертации:'
+    text = s.MESSAGE_TEXT[data['m']]
     bot.send_message(call.message.chat.id, text, reply_markup=get_amount_markup(data), parse_mode='Markdown')
 
 
@@ -91,14 +91,17 @@ def get_amount_markup(data):
     keyboard = t.InlineKeyboardMarkup()
     data = data_normalisation(data)
     mode = data['m']
-    for i in [10, 100, 1000]:
+    for i in [1, 10, 100]:
         dt1 = data.copy()
         dt2 = data.copy()
+        dt3 = data.copy()
         dt1['am'] = i
         dt2['am'] = i * 1000
+        dt3['am'] = i * 1000000
         item1 = t.InlineKeyboardButton(f'{i}', callback_data=f'{mode}#{dt1}')
         item2 = t.InlineKeyboardButton(f'{i * 1000}', callback_data=f'{mode}#{dt2}')
-        keyboard.add(item1, item2)
+        item3 = t.InlineKeyboardButton(f'{i * 1000000}', callback_data=f'{mode}#{dt3}')
+        keyboard.add(item1, item2, item3)
     return keyboard
 
 
@@ -123,9 +126,10 @@ def tes(call):
             call.message.chat.id,
             call.message.message_id
         )
+
         bot.send_message(
             call.message.chat.id,
-            'Выберите валюту:',
+            s.MESSAGE_TEXT[mode],
             reply_markup=get_markup(call.data.split('#')[-1], page),
             parse_mode='Markdown'
         )
@@ -135,18 +139,6 @@ def tes(call):
         quote_handler(call)
     elif mode == 'am':
         amount_handler(call)
-    elif mode == 'page':
-        page = int(call.data.split('#')[1])
-        bot.delete_message(
-            call.message.chat.id,
-            call.message.message_id
-        )
-        bot.send_message(
-            call.message.chat.id,
-            'Выберите валюту:',
-            reply_markup=get_markup(call.data.split('#')[-1], page),
-            parse_mode='Markdown'
-        )
     else:
         pass
         #print(call.data)
